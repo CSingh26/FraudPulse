@@ -7,6 +7,38 @@
 3. The worker consumes jobs from Redis, calls the ML service `/score`, and stores alerts.
 4. The dashboard polls the API for alerts, metrics, and transactions.
 
+```
++---------------------+       +-------------------+       +------------------+
+| Simulator           | ----> | API /transactions | ----> | Redis (BullMQ)   |
++---------------------+       +-------------------+       +---------+--------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | Worker      |
+                                                         +------+------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | ML /score   |
+                                                         +------+------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | Postgres    |
+                                                         | alerts/tx   |
+                                                         +------+------+
+
++------------------+        +-------------------+        +------------------------+
+| Web Dashboard    | <----- | API /alerts       | <----- | ML /model metadata     |
+| (Next.js)        | <----- | API /metrics      |        | (auto-trained on start)|
+|                  | <----- | API /transactions |        +------------------------+
++------------------+        +-------------------+
+
++------------------+        +-------------------+
+| Synthetic/CSV    | -----> | ML /train         |
++------------------+        +-------------------+
+```
+
 ## Core services
 
 - **API (`apps/api`)**

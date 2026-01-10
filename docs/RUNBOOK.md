@@ -23,6 +23,16 @@
 10. `pnpm --filter @fraudpulse/api worker`
 11. `cd services/ml && python3 -m uvicorn app.main:app --reload --port 8000`
 
+## One-command launch
+
+To run infra, migrations, tests, and all services in one step:
+
+```
+./scripts/launch.sh
+```
+
+Logs are written to `logs/` and include separate files for the web/API, worker, ML service, and simulator.
+
 ## Simulator
 
 Run the simulator to push synthetic transactions continuously:

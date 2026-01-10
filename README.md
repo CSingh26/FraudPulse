@@ -5,33 +5,35 @@ FraudPulse is a production-ready monorepo for real-time fraud detection and an a
 ## Architecture
 
 ```
-+--------------+        +-------------------+       +------------------+
-| Simulator    | -----> | API /transactions | ----> | Redis (BullMQ)   |
-+--------------+        +-------------------+       +---------+--------+
-                                                               |
-                                                               v
-                                                        +------+------+
-                                                        | Worker      |
-                                                        +------+------+
-                                                               |
-                                                               v
-                                                        +------+------+
-                                                        | ML Service  |
-                                                        |  /score     |
-                                                        +------+------+
-                                                               |
-                                                               v
-                                                        +------+------+
-                                                        | Postgres    |
-                                                        | alerts/tx   |
-                                                        +------+------+
++---------------------+       +-------------------+       +------------------+
+| Simulator           | ----> | API /transactions | ----> | Redis (BullMQ)   |
++---------------------+       +-------------------+       +---------+--------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | Worker      |
+                                                         +------+------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | ML /score   |
+                                                         +------+------+
+                                                                |
+                                                                v
+                                                         +------+------+
+                                                         | Postgres    |
+                                                         | alerts/tx   |
+                                                         +------+------+
 
-+----------------+        +-------------------+
-| Web Dashboard  | <----- | API /alerts       |
-| (Next.js)      | <----- | API /metrics      |
-|                | <----- | API /transactions |
-|                | <----- | API /model        |
-+----------------+        +-------------------+
++------------------+        +-------------------+        +------------------------+
+| Web Dashboard    | <----- | API /alerts       | <----- | ML /model metadata     |
+| (Next.js)        | <----- | API /metrics      |        | (auto-trained on start)|
+|                  | <----- | API /transactions |        +------------------------+
++------------------+        +-------------------+
+
++------------------+        +-------------------+
+| Synthetic/CSV    | -----> | ML /train         |
++------------------+        +-------------------+
 ```
 
 ## Repository layout
@@ -42,6 +44,10 @@ FraudPulse is a production-ready monorepo for real-time fraud detection and an a
 - `infra`: docker-compose for Postgres, Redis, Adminer
 - `shared`: shared types/SDK (reserved for future extensions)
 - `docs`: architecture notes and runbook
+
+## Skills used
+
+No Codex skills were invoked for this build (skill-creator and skill-installer were not used).
 
 ## Quick start
 
@@ -90,6 +96,16 @@ cd services/ml && python3 -m uvicorn app.main:app --reload --port 8000
 pnpm simulate
 ```
 
+## One-command launch
+
+Run everything with tests and logs in one step:
+
+```
+./scripts/launch.sh
+```
+
+This script runs migrations, seeds, API + ML tests, then starts the API, web app, worker, ML service, and simulator. Logs are written to `logs/`.
+
 ## Useful commands
 
 - `pnpm dev`: run web + api dev servers
@@ -105,4 +121,4 @@ pnpm simulate
 - ML: `http://localhost:8000`
 - Adminer: `http://localhost:8080`
 
-For more details, see `docs/RUNBOOK.md` and `docs/ARCHITECTURE.md`.
+For more details, see `docs/RUNBOOK.md`, `docs/ARCHITECTURE.md`, and `docs/RELEASE.md`.
