@@ -52,6 +52,8 @@ cd infra
 docker compose up -d
 ```
 
+Postgres is exposed on `localhost:5433` to avoid conflicts with local Postgres installs.
+
 2. Install dependencies:
 
 ```

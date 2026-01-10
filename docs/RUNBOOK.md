@@ -5,7 +5,7 @@
 - API: `http://localhost:3001`
 - Web: `http://localhost:3000`
 - ML: `http://localhost:8000`
-- Postgres: `localhost:5432`
+- Postgres: `localhost:5433`
 - Redis: `localhost:6379`
 - Adminer: `http://localhost:8080`
 
