@@ -38,6 +38,7 @@ const statusOptions: AlertStatus[] = [
   'RESOLVED',
   'FALSE_POSITIVE',
 ];
+const allStatusesValue = 'ALL';
 
 const statusVariant = (status: AlertStatus) => {
   if (status === 'OPEN') return 'warning';
@@ -166,11 +167,11 @@ export default function AlertsPage() {
               }
             />
             <Select
-              value={filters.status}
+              value={filters.status || allStatusesValue}
               onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  status: value,
+                  status: value === allStatusesValue ? '' : value,
                   page: 1,
                 }))
               }
@@ -179,7 +180,7 @@ export default function AlertsPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
+                <SelectItem value={allStatusesValue}>All statuses</SelectItem>
                 {statusOptions.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
