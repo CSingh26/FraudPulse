@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "worker": "tsx watch src/worker.ts",
+    "simulate": "tsx src/simulator.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "test": "prisma generate && vitest run",
