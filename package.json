@@ -7,6 +7,8 @@
     "lint": "pnpm -r lint",
     "format": "prettier -w .",
     "test": "pnpm -r test",
+    "test:api": "pnpm --filter @fraudpulse/api test",
+    "test:ml": "PYTHONPATH=services/ml python3 -m unittest discover -s services/ml/tests",
     "db:migrate": "pnpm --filter @fraudpulse/api db:migrate",
     "seed": "pnpm --filter @fraudpulse/api db:seed",
     "simulate": "pnpm --filter @fraudpulse/api simulate"
