@@ -1,4 +1,10 @@
-import type { AlertsResponse, MetricsOverview, Alert } from './types';
+import type {
+  AlertsResponse,
+  MetricsOverview,
+  Alert,
+  ModelInfo,
+  TransactionsResponse,
+} from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -38,4 +44,25 @@ export const fetchAlert = async (id: string): Promise<Alert> => {
     cache: 'no-store',
   });
   return handleResponse<Alert>(response);
+};
+
+export const fetchTransactions = async (
+  params: Record<string, string | number | undefined>,
+): Promise<TransactionsResponse> => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      query.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(`${API_URL}/transactions?${query.toString()}`, {
+    cache: 'no-store',
+  });
+  return handleResponse<TransactionsResponse>(response);
+};
+
+export const fetchModelInfo = async (): Promise<ModelInfo> => {
+  const response = await fetch(`${API_URL}/model`, { cache: 'no-store' });
+  return handleResponse<ModelInfo>(response);
 };

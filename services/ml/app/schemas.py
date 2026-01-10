@@ -36,3 +36,12 @@ class TrainResponse(BaseModel):
   threshold: float
   metrics: dict[str, float]
   sample_size: int
+
+
+class ModelInfoResponse(BaseModel):
+  model_version: str
+  trained_at: str | None
+  threshold: float
+  metrics: dict[str, float]
+  confusion_matrix: dict[str, int] | None
+  sample_size: int | None

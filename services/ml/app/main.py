@@ -3,10 +3,11 @@ from pathlib import Path
 from fastapi import FastAPI, Header, HTTPException
 
 from .config import settings
-from .model import score_with_model
+from .model import get_model_metadata, score_with_model
 from .scoring import score_transaction
 from .schemas import (
   FeatureImpactResponse,
+  ModelInfoResponse,
   ScoreResponse,
   TrainRequest,
   TrainResponse,
@@ -83,4 +84,17 @@ def train(request: TrainRequest, x_train_token: str | None = Header(None)):
     threshold=metadata['threshold'],
     metrics=metadata['metrics'],
     sample_size=metadata['sample_size'],
+  )
+
+
+@app.get('/model', response_model=ModelInfoResponse)
+def model_info():
+  metadata = get_model_metadata()
+  return ModelInfoResponse(
+    model_version=metadata.get('model_version', settings.model_version),
+    trained_at=metadata.get('trained_at'),
+    threshold=metadata.get('threshold', settings.fraud_threshold),
+    metrics=metadata.get('metrics', {}),
+    confusion_matrix=metadata.get('confusion_matrix'),
+    sample_size=metadata.get('sample_size'),
   )

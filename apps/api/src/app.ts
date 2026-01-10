@@ -7,6 +7,7 @@ import { notFoundHandler } from './middleware/not-found';
 import { requestLogger } from './middleware/request-logger';
 import { alertsRouter } from './routes/alerts';
 import { metricsRouter } from './routes/metrics';
+import { modelRouter } from './routes/model';
 import { transactionsRouter } from './routes/transactions';
 
 export const createApp = () => {
@@ -29,6 +30,7 @@ export const createApp = () => {
   app.use('/transactions', transactionsRouter);
   app.use('/alerts', alertsRouter);
   app.use('/metrics', metricsRouter);
+  app.use('/model', modelRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

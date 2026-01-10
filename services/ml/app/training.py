@@ -8,7 +8,7 @@ import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -103,6 +103,8 @@ def train_model(
     'roc_auc': float(roc_auc_score(y_test, probabilities)),
   }
 
+  tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
+
   output_dir.mkdir(parents=True, exist_ok=True)
   model_path = output_dir / 'model.joblib'
   metadata_path = output_dir / 'metadata.json'
@@ -115,6 +117,12 @@ def train_model(
     'trained_at': datetime.utcnow().isoformat() + 'Z',
     'threshold': threshold,
     'metrics': metrics,
+    'confusion_matrix': {
+      'tn': int(tn),
+      'fp': int(fp),
+      'fn': int(fn),
+      'tp': int(tp),
+    },
     'sample_size': int(len(dataset)),
     'feature_names': feature_names,
     'categorical_features': CATEGORICAL_FEATURES,

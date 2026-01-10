@@ -81,3 +81,18 @@ def score_with_model(payload: dict) -> dict | None:
     'top_features': _compute_feature_impacts(model, features),
     'model_version': model_version,
   }
+
+
+def get_model_metadata() -> dict:
+  _, metadata = load_artifacts()
+  if metadata:
+    return metadata
+
+  return {
+    'model_version': settings.model_version,
+    'trained_at': None,
+    'threshold': settings.fraud_threshold,
+    'metrics': {},
+    'confusion_matrix': None,
+    'sample_size': None,
+  }

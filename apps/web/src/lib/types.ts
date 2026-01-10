@@ -52,6 +52,13 @@ export type AlertsResponse = {
   total: number;
 };
 
+export type TransactionsResponse = {
+  data: Transaction[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
 export type MetricsOverview = {
   fraudRateSeries: Array<{
     date: string;
@@ -67,4 +74,13 @@ export type MetricsOverview = {
     alertCount: number;
     avgScore: number;
   }>;
+};
+
+export type ModelInfo = {
+  model_version: string;
+  trained_at: string | null;
+  threshold: number;
+  metrics: Record<string, number>;
+  confusion_matrix: Record<string, number> | null;
+  sample_size: number | null;
 };
