@@ -5,6 +5,9 @@ import { env } from './config/env';
 import { errorHandler } from './middleware/error-handler';
 import { notFoundHandler } from './middleware/not-found';
 import { requestLogger } from './middleware/request-logger';
+import { alertsRouter } from './routes/alerts';
+import { metricsRouter } from './routes/metrics';
+import { transactionsRouter } from './routes/transactions';
 
 export const createApp = () => {
   const app = express();
@@ -22,6 +25,10 @@ export const createApp = () => {
       timestamp: new Date().toISOString(),
     });
   });
+
+  app.use('/transactions', transactionsRouter);
+  app.use('/alerts', alertsRouter);
+  app.use('/metrics', metricsRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
