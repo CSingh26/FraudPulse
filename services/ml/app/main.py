@@ -1,34 +1,20 @@
-from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from pathlib import Path
+
+from fastapi import FastAPI, Header, HTTPException
 
 from .config import settings
+from .model import score_with_model
 from .scoring import score_transaction
+from .schemas import (
+  FeatureImpactResponse,
+  ScoreResponse,
+  TrainRequest,
+  TrainResponse,
+  TransactionPayload,
+)
+from .training import train_model
 
 app = FastAPI(title='FraudPulse ML Service', version=settings.model_version)
-
-
-class TransactionPayload(BaseModel):
-  amount: float = Field(..., ge=0)
-  currency: str
-  card_country: str
-  merchant_country: str
-  merchant_category: str
-  channel: str
-  entry_mode: str
-  ip_country: str | None = None
-
-
-class FeatureImpactResponse(BaseModel):
-  name: str
-  impact: float
-
-
-class ScoreResponse(BaseModel):
-  score: float
-  label: str
-  recommended_action: str
-  model_version: str
-  top_features: list[FeatureImpactResponse]
 
 
 @app.get('/health')
@@ -42,7 +28,19 @@ def health():
 
 @app.post('/score', response_model=ScoreResponse)
 def score(payload: TransactionPayload):
-  result = score_transaction(
+  model_result = score_with_model(payload.model_dump())
+  if model_result:
+    return ScoreResponse(
+      score=model_result['score'],
+      label=model_result['label'],
+      recommended_action=model_result['recommended_action'],
+      model_version=model_result['model_version'],
+      top_features=[
+        FeatureImpactResponse(**feature) for feature in model_result['top_features']
+      ],
+    )
+
+  fallback = score_transaction(
     amount=payload.amount,
     channel=payload.channel,
     entry_mode=payload.entry_mode,
@@ -54,12 +52,35 @@ def score(payload: TransactionPayload):
   )
 
   return ScoreResponse(
-    score=result.score,
-    label=result.label,
-    recommended_action=result.recommended_action,
+    score=fallback.score,
+    label=fallback.label,
+    recommended_action=fallback.recommended_action,
     model_version=settings.model_version,
     top_features=[
       FeatureImpactResponse(name=feature.name, impact=feature.impact)
-      for feature in result.top_features
+      for feature in fallback.top_features
     ],
+  )
+
+
+@app.post('/train', response_model=TrainResponse)
+def train(request: TrainRequest, x_train_token: str | None = Header(None)):
+  if settings.train_token and x_train_token != settings.train_token:
+    raise HTTPException(status_code=401, detail='Invalid training token')
+
+  dataset_path = request.dataset_path or settings.dataset_path
+  output_dir = Path(settings.model_path).parent
+
+  metadata = train_model(
+    dataset_path=dataset_path,
+    sample_size=request.sample_size,
+    output_dir=output_dir,
+    threshold=settings.fraud_threshold,
+  )
+
+  return TrainResponse(
+    model_version=metadata['model_version'],
+    threshold=metadata['threshold'],
+    metrics=metadata['metrics'],
+    sample_size=metadata['sample_size'],
   )

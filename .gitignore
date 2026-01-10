@@ -18,6 +18,10 @@ out/
 # Prisma
 prisma/*.db
 
+# ML artifacts
+services/ml/artifacts/*.joblib
+services/ml/artifacts/metadata.json
+
 # IDE
 .vscode/
 .idea/
