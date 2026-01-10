@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException
@@ -16,6 +17,34 @@ from .schemas import (
 from .training import train_model
 
 app = FastAPI(title='FraudPulse ML Service', version=settings.model_version)
+logger = logging.getLogger(__name__)
+
+
+def _artifacts_exist() -> bool:
+  model_path = Path(settings.model_path)
+  metadata_path = Path(settings.metadata_path)
+  return model_path.exists() and metadata_path.exists()
+
+
+@app.on_event('startup')
+def warm_start_model():
+  if not settings.auto_train_on_startup:
+    return
+
+  if _artifacts_exist():
+    return
+
+  try:
+    output_dir = Path(settings.model_path).parent
+    train_model(
+      dataset_path=settings.dataset_path,
+      sample_size=settings.auto_train_sample_size,
+      output_dir=output_dir,
+      threshold=settings.fraud_threshold,
+    )
+    logger.info('Auto-trained model artifacts for local startup.')
+  except Exception:
+    logger.exception('Auto-training failed. Falling back to heuristic scorer.')
 
 
 @app.get('/health')
