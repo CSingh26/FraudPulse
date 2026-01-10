@@ -19,7 +19,7 @@ export const SideNav = () => {
   return (
     <nav className="space-y-1 px-4">
       {navItems.map((item) => {
-        const active = pathname === item.href;
+        const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
         const Icon = item.icon;
         return (
           <Link
