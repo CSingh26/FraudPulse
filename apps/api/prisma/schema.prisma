@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AlertStatus {
+  OPEN
+  INVESTIGATING
+  ESCALATED
+  RESOLVED
+  FALSE_POSITIVE
+}
+
+enum AlertLabel {
+  FRAUD
+  LEGIT
+}
+
+model Merchant {
+  id           String        @id @default(cuid())
+  name         String
+  category     String
+  country      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+
+  @@unique([name, country])
+  @@index([name])
+  @@index([country])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  currency    String
+  cardId      String
+  cardCountry String
+  merchantId  String
+  channel     String
+  entryMode   String
+  ipCountry   String?
+  deviceId    String?
+  occurredAt  DateTime
+  createdAt   DateTime @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  alert    Alert?
+
+  @@index([cardId])
+  @@index([merchantId])
+  @@index([occurredAt])
+}
+
+model Alert {
+  id                String      @id @default(cuid())
+  transactionId     String      @unique
+  score             Float
+  label             AlertLabel
+  status            AlertStatus @default(OPEN)
+  explanation       Json?
+  recommendedAction String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  transaction Transaction         @relation(fields: [transactionId], references: [id])
+  notes       InvestigationNote[]
+
+  @@index([status])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model InvestigationNote {
+  id        String   @id @default(cuid())
+  alertId   String
+  author    String
+  note      String
+  createdAt DateTime @default(now())
+
+  alert Alert @relation(fields: [alertId], references: [id])
+
+  @@index([alertId])
+}
