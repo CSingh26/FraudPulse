@@ -1,0 +1,17 @@
+{
+  "name": "fraudpulse",
+  "private": true,
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "lint": "pnpm -r lint",
+    "format": "prettier -w .",
+    "test": "pnpm -r test",
+    "db:migrate": "pnpm --filter @fraudpulse/api db:migrate",
+    "seed": "pnpm --filter @fraudpulse/api db:seed",
+    "simulate": "pnpm --filter @fraudpulse/api simulate"
+  },
+  "devDependencies": {
+    "prettier": "3.3.3"
+  }
+}

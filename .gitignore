@@ -1,0 +1,23 @@
+node_modules
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Next.js
+.next/
+out/
+
+# Prisma
+prisma/*.db
+
+# IDE
+.vscode/
+.idea/
