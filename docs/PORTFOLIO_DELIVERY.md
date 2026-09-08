@@ -47,3 +47,9 @@ The research release satisfies the requested behavioral/metric/cost/explanation 
 
 ### Cross-project regression follow-up
 A later LedgerLens review exposed FastAPI's default nonfinite-error serialization edge case. FraudPulse now sanitizes validation error fields and returns422 for raw NaN, Infinity and1e999 costs. Added one regression test covering all three payloads; the ML suite now has16 tests (21 total with3 database API and2 browser tests). This is a narrow error-path change; final CI is verified against its pushed SHA.
+
+## Subsequent verified security maintenance
+
+Nonfinite request validation follow-up `230de0dd5783801c1aeec4d0ef7c41213de5d3e1` passed full default-branch CI: https://github.com/CSingh26/FraudPulse/actions/runs/34281570720. The ML suite now has 16 passing tests (21 total across ML/API/browser checks).
+
+A newly available Next.js advisory GHSA-p293-qw3h-jr36 affected the earlier tested 15.5.21 pin. Next and eslint-config-next were updated together to 15.5.25 with the pnpm lock regenerated. Web lint, production build and type checks passed; the production dependency audit again returned zero known advisories. Earlier zero-advisory reports reflect their original check times, not a guarantee against future disclosures.
