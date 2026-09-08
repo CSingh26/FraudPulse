@@ -29,3 +29,8 @@ class ResearchApiTests(unittest.TestCase):
         self.assertIn('Missing columns', response.json()['detail'])
         self.assertEqual(self.client.post('/research/analyze', json={'csv': demo_csv(), 'review_cost': -1}).status_code, 422)
         self.assertEqual(self.client.post('/research/analyze', json={'csv': 'x' * 2000001}).status_code, 422)
+
+    def test_nonfinite_raw_json_returns_validation_error(self):
+        for value in ['NaN', 'Infinity', '1e999']:
+            response = self.client.post('/research/demo', content='{"review_cost":'+value+'}', headers={'Content-Type':'application/json'})
+            self.assertEqual(response.status_code, 422)

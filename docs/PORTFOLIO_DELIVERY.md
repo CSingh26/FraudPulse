@@ -43,3 +43,7 @@ The research release satisfies the requested behavioral/metric/cost/explanation 
 ## Verified GitHub release gate
 
 [GitHub Actions run 34278949001](https://github.com/CSingh26/FraudPulse/actions/runs/34278949001) completed **SUCCESS** for `344b2f11dbc669121b758b67d73f3a8c7f3cb2d6` on 2026-09-08. All installation, migration, API/ML tests, lint, typecheck, build and Chromium steps passed. This delivery-record commit contains documentation only; its own final default-branch CI is verified by the portfolio orchestrator against the remote SHA.
+
+
+### Cross-project regression follow-up
+A later LedgerLens review exposed FastAPI's default nonfinite-error serialization edge case. FraudPulse now sanitizes validation error fields and returns422 for raw NaN, Infinity and1e999 costs. Added one regression test covering all three payloads; the ML suite now has16 tests (21 total with3 database API and2 browser tests). This is a narrow error-path change; final CI is verified against its pushed SHA.

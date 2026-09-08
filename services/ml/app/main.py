@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from .config import settings
 from .research_routes import router as research_router
@@ -20,6 +22,14 @@ from .training import train_model
 app = FastAPI(title='FraudPulse ML Service', version=settings.model_version)
 logger = logging.getLogger(__name__)
 app.include_router(research_router)
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request, exc):
+  # Invalid nonfinite inputs cannot safely be echoed by JSON error serialization.
+  detail = [{'location': '.'.join(map(str, error['loc'])), 'message': error['msg']}
+            for error in exc.errors()]
+  return JSONResponse({'detail': detail}, status_code=422)
+
 
 
 def _artifacts_exist() -> bool:
