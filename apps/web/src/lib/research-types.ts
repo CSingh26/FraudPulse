@@ -1,5 +1,5 @@
 export type Evaluation = {
-  threshold: number; precision: number; recall: number; accuracy: number;
+  threshold: number; precision: number | null; recall: number | null; accuracy: number;
   roc_auc: number | null; pr_auc: number | null; average_precision: number | null;
   prevalence: number; flagged: number; cost: number; missed_fraud_amount: number;
   confusion_matrix: { tn: number; fp: number; fn: number; tp: number };

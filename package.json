@@ -8,7 +8,7 @@
     "format": "prettier -w .",
     "test": "pnpm -r test",
     "test:api": "pnpm --filter @fraudpulse/api test",
-    "test:ml": "bash scripts/test-ml.sh",
+    "test:ml": "PYTHONPATH=services/ml python3 -m unittest discover -s services/ml/tests",
     "db:migrate": "pnpm --filter @fraudpulse/api db:migrate",
     "seed": "pnpm --filter @fraudpulse/api db:seed",
     "simulate": "pnpm --filter @fraudpulse/api simulate",
@@ -17,7 +17,21 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "1.55.0",
+    "@playwright/test": "1.55.1",
     "prettier": "3.3.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "lodash": "4.18.0",
+      "qs": "6.16.0",
+      "postcss": "8.5.23",
+      "nanoid": "3.3.18",
+      "path-to-regexp": "0.1.13",
+      "uuid": "11.1.1",
+      "on-headers": "1.1.0",
+      "body-parser": "1.20.6",
+      "@typescript-eslint/parser": "8.70.0",
+      "sharp": "0.35.0"
+    }
   }
 }

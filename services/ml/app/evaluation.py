@@ -13,8 +13,8 @@ def evaluate(labels, scores, amounts, threshold, review_cost, false_positive_cos
     precision, recall, _ = precision_recall_curve(y, s) if two_classes else ([], [], [])
     return {
         'threshold': float(threshold), 'confusion_matrix': dict(tn=int(tn), fp=int(fp), fn=int(fn), tp=int(tp)),
-        'precision': float(tp / (tp + fp)) if tp + fp else 0.0,
-        'recall': float(tp / (tp + fn)) if tp + fn else 0.0,
+        'precision': float(tp / (tp + fp)) if tp + fp else None,
+        'recall': float(tp / (tp + fn)) if tp + fn else None,
         'accuracy': float((tp + tn) / len(y)), 'flagged': int(flagged.sum()),
         'prevalence': float(np.mean(y)), 'missed_fraud_amount': missed,
         'cost': float(flagged.sum() * review_cost + fp * false_positive_cost + missed * loss_fraction),

@@ -111,3 +111,10 @@ class ResearchTests(unittest.TestCase):
         data['label'] = 0
         with self.assertRaisesRegex(ValueError, 'both classes'):
             run_research(data, 1, 5, 1)
+
+class UndefinedRatioTests(unittest.TestCase):
+    def test_no_flags_precision_is_undefined(self):
+        self.assertIsNone(evaluate([0, 1], [.1, .2], [1, 2], .5, 1, 1, 1)['precision'])
+
+    def test_no_fraud_recall_is_undefined(self):
+        self.assertIsNone(evaluate([0, 0], [.1, .2], [1, 2], .5, 1, 1, 1)['recall'])

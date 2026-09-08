@@ -38,9 +38,9 @@ export default function RootLayout({
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
                     Fraud Operations
                   </p>
-                  <h2 className="text-lg font-semibold text-slate-900">Active Overview</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Transaction intelligence</h2>
                 </div>
-                <div className="text-sm text-slate-500">Live pipeline health</div>
+                <div className="text-sm text-slate-500">Research · review · evidence</div>
               </header>
               <main className="flex-1 px-8 py-8">{children}</main>
             </div>

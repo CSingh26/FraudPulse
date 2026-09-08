@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest, { params }: { params: { action: string } }) {
-  if (!['analyze', 'demo'].includes(params.action)) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ action: string }> }) {
+  const { action } = await params;
+  if (!['analyze', 'demo'].includes(action)) {
     return NextResponse.json({ detail: 'Unknown research action' }, { status: 404 });
   }
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest, { params }: { params: { action:
     if (new TextEncoder().encode(body).length > 2_100_000) {
       return NextResponse.json({ detail: 'Upload exceeds 2 MB' }, { status: 413 });
     }
-    const response = await fetch(`${process.env.ML_URL ?? 'http://127.0.0.1:8000'}/research/${params.action}`, {
+    const response = await fetch(`${process.env.ML_URL ?? 'http://127.0.0.1:8000'}/research/${action}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body,
       signal: AbortSignal.timeout(60000), cache: 'no-store',
     });

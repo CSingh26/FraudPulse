@@ -5,7 +5,7 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ResearchResult, ResearchTransaction } from '@/lib/research-types';
 
-const number = (value: number | null) => value === null ? 'Undefined (one class)' : value.toFixed(3);
+const number = (value: number | null) => value === null ? 'Undefined' : value.toFixed(3);
 const label = (name: string) => name.replace(/_/g, ' ');
 
 function RankingChart({ title, points, x, y }: { title: string; points: { x: number; y: number }[]; x: string; y: string }) {
@@ -50,14 +50,14 @@ export default function ResearchPage() {
     <Card><CardHeader><CardTitle>1. Supply transactions and investigation economics</CardTitle><CardDescription>Upload settled, labeled transactions in one reporting currency. CSV is analyzed in memory and is not persisted by this workflow.</CardDescription></CardHeader>
       <CardContent className="space-y-4">
         <label className="block text-sm font-medium">Transaction CSV (maximum 2 MB / 10,000 rows)
-          <input className="mt-2 block w-full rounded border p-2" type="file" accept=".csv,text/csv" onChange={async e => {
+          <input className="mt-2 block w-full rounded border p-2" disabled={busy} type="file" accept=".csv,text/csv" onChange={async e => {
             const file = e.target.files?.[0]; setResult(null); setSelected(null); setCsv(''); setFilename(file?.name ?? 'No CSV selected'); setError('');
             if (file) { if (file.size > 2000000) setError('CSV exceeds 2 MB'); else setCsv(await file.text()); }
           }} /></label>
         <p className="text-xs text-slate-500">{filename}. Required columns: transaction_id, account_id, timestamp, amount, currency, category, country, label. At least 50 rows / 10 timestamps. ISO timestamps require timezone; labels 0/1.</p>
         <div className="grid gap-4 md:grid-cols-3">{[
           ['Review cost per flag', reviewCost, setReviewCost], ['Additional false-positive cost', falsePositiveCost, setFalsePositiveCost], ['Missed fraud loss fraction (0–1)', lossFraction, setLossFraction],
-        ].map(([title, value, setter]) => <label key={title as string} className="text-sm font-medium">{title as string}<input className="mt-1 w-full rounded border p-2" type="number" min="0" step="any" value={value as string} onChange={e => (setter as (v: string) => void)(e.target.value)} /></label>)}</div>
+        ].map(([title, value, setter]) => <label key={title as string} className="text-sm font-medium">{title as string}<input className="mt-1 w-full rounded border p-2" disabled={busy} type="number" min="0" step="any" value={value as string} onChange={e => { setResult(null); setSelected(null); (setter as (v: string) => void)(e.target.value); }} /></label>)}</div>
         <p className="text-xs text-slate-500">Costs use the CSV reporting currency. Changing assumptions requires a new experiment; no test threshold is tuned interactively.</p>
         <div className="flex flex-wrap gap-3"><button disabled={busy || !csv} onClick={() => analyze(false)} className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-40">Analyze my CSV</button>
           <button disabled={busy} onClick={() => analyze(true)} className="rounded border border-teal-700 px-4 py-2 text-teal-800 disabled:opacity-40">Run labeled DEMO DATA</button></div>
@@ -69,7 +69,7 @@ export default function ResearchPage() {
       <div className="grid gap-4 md:grid-cols-3">{[
         ['Investigations', `${result.test.flagged} / ${result.metadata.split_counts.test}`, 'Transactions exceeding the selected threshold.'],
         ['Missed fraud exposure', money(result.test.missed_fraud_amount), 'Total amount of labeled fraud below threshold, before loss fraction.'],
-        ['Scenario cost', money(result.test.cost), 'Reviews + false-positive friction + missed loss. This is not realized savings.'],
+        ['Scenario cost', money(result.test.cost), 'Reviews + false-positive friction + missed loss. Assumes reviewed fraud is fully prevented; not realized savings.'],
       ].map(([title, value, detail]) => <Card key={title}><CardHeader><CardDescription>{title}</CardDescription><CardTitle>{value}</CardTitle></CardHeader><CardContent className="text-sm text-slate-500">{detail}</CardContent></Card>)}</div>
       <Card><CardHeader><CardTitle>Detection quality and economics</CardTitle><CardDescription>An always-legitimate classifier can look accurate while missing every fraud.</CardDescription></CardHeader><CardContent className="overflow-x-auto">
         <table className="w-full text-left text-sm"><thead><tr>{['Policy', 'Precision', 'Recall', 'FP / FN', 'Cost'].map(x => <th key={x} className="p-2">{x}</th>)}</tr></thead><tbody>{[['Selected', result.test], ['Always allow', result.baselines.allow_all], ['Always review', result.baselines.review_all]].map(([name, metric]) => {

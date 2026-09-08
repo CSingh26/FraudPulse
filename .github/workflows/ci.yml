@@ -1,10 +1,10 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
-
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,58 +16,42 @@ jobs:
           POSTGRES_USER: fraudpulse
           POSTGRES_PASSWORD: fraudpulse
           POSTGRES_DB: fraudpulse
-        ports:
-          - 5432:5432
+        ports: ['5432:5432']
         options: >-
           --health-cmd="pg_isready -U fraudpulse"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=5
+          --health-interval=5s --health-timeout=5s --health-retries=5
       redis:
         image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=5
+        ports: ['6379:6379']
     env:
       DATABASE_URL: postgresql://fraudpulse:fraudpulse@localhost:5432/fraudpulse?schema=public
       REDIS_URL: redis://localhost:6379
-      ML_URL: http://localhost:8000
+      ML_URL: http://localhost:8182
       QUEUE_NAME: txn-score
-      RUN_INTEGRATION_TESTS: true
+      RUN_INTEGRATION_TESTS: 'true'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
         with:
           version: 9.12.0
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run migrations
-        run: pnpm --filter @fraudpulse/api db:migrate
-
-      - name: Run API tests
-        run: pnpm --filter @fraudpulse/api test
-
-      - name: Run ML tests
-        run: pnpm test:ml
-
-      - name: Run web lint
-        run: pnpm --filter @fraudpulse/web lint
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: pip install -r services/ml/requirements.txt
+      - run: pnpm --filter @fraudpulse/api exec prisma migrate deploy
+      - run: pnpm test:api
+      - run: pnpm test:ml
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: research-ui
+          path: docs/assets/research-workspace.png
