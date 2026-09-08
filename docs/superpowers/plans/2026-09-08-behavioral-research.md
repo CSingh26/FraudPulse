@@ -6,9 +6,9 @@
 **Spec:** docs/superpowers/specs/2026-09-08-behavioral-research.md
 **Execution:** Inline under explicit autonomous user authorization; independent reviewer assigned by orchestrator.
 
-- [ ] Write `services/ml/tests/test_research.py`: hand-calculated prior-hour counts, amount mean/deviation, simultaneous/future exclusion, currency/time/label rejection, hand-calculated threshold cost and ROC/AP cases. Run red before implementing `app/behavior.py` and `app/evaluation.py`.
-- [ ] Implement chronological `app/research.py` with train-only scaling/logistic regression and validation threshold selection. Test label mutations leave threshold unchanged, deterministic reproducibility, cold starts, provenance hash and explanation reconstruction; run red first.
-- [ ] Add FastAPI research JSON endpoints and demo CSV, bounded input schemas and tests for successful import and malformed payloads. Preserve deployment scorer and mark legacy synthetic output honestly.
-- [ ] Add Next `/research` UI, same-origin API proxy, CSV upload, costs, results, ROC/PR plots, validation thresholds and individual explanations. Verify user workflow and error propagation.
-- [ ] Repair full-project reproducible CI: frozen pnpm install, Python pinned dependencies, lint, typecheck, ML/API tests and builds; run each locally as infrastructure permits.
-- [ ] Write finance-first README, methodology/data/model docs and observed delivery report. Secret scan, commit/push each tested milestone, verify final GitHub Actions and remote SHA.
+- [x] Write `services/ml/tests/test_research.py`: hand-calculated prior-hour counts, amount mean/deviation, simultaneous/future exclusion, currency/time/label rejection, hand-calculated threshold cost and ROC/AP cases. Run red before implementing `app/behavior.py` and `app/evaluation.py`.
+- [x] Implement chronological `app/research.py` with train-only scaling/logistic regression and validation threshold selection. Test label mutations leave threshold unchanged, deterministic reproducibility, cold starts, provenance hash and explanation reconstruction; run red first.
+- [x] Add FastAPI research JSON endpoints and demo CSV, bounded input schemas and tests for successful import and malformed payloads. Preserve deployment scorer and mark legacy synthetic output honestly.
+- [x] Add Next `/research` UI, same-origin API proxy, CSV upload, costs, results, ROC/PR plots, validation thresholds and individual explanations. Verify user workflow and error propagation.
+- [x] Repair full-project reproducible CI: frozen pnpm install, Python pinned dependencies, lint, typecheck, ML/API tests and builds; run each locally as infrastructure permits.
+- [x] Write finance-first README, methodology/data/model docs and observed delivery report. Secret scan, commit/push each tested milestone, verify final GitHub Actions and remote SHA.
