@@ -7,6 +7,7 @@ import { Activity, AlertTriangle, LayoutDashboard, ReceiptText } from 'lucide-re
 import { cn } from '@/lib/utils';
 
 const navItems = [
+  { href: '/research', label: 'Behavioral research', icon: Activity },
   { href: '/', label: 'Overview', icon: LayoutDashboard },
   { href: '/alerts', label: 'Alerts', icon: AlertTriangle },
   { href: '/transactions', label: 'Transactions', icon: ReceiptText },

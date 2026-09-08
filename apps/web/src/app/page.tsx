@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
   CartesianGrid,
@@ -84,9 +85,11 @@ export default function OverviewPage() {
       <div>
         <h3 className="text-2xl font-semibold text-slate-900">Overview</h3>
         <p className="mt-1 text-sm text-slate-500">
-          Live fraud monitoring, performance snapshots, and merchant risk signals.
+          Operational model flags and investigation activity. Flags are not confirmed fraud.
         </p>
       </div>
+
+      <Link href="/research" className="block rounded border border-teal-200 bg-teal-50 p-4 text-teal-800">Explore behavioral research → Upload transactions, investigate alerts, and compare review costs with missed fraud exposure.</Link>
 
       {error ? (
         <Card>
@@ -101,18 +104,18 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold text-slate-900">
-              {loading ? '—' : kpis.activeAlerts}
+              {loading || !metrics ? '—' : kpis.activeAlerts}
             </div>
             <p className="mt-1 text-xs text-slate-500">Open investigations and escalations</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-slate-500">Fraud rate</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-500">Flag rate</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold text-slate-900">
-              {loading ? '—' : `${(kpis.fraudRate * 100).toFixed(1)}%`}
+              {loading || !metrics ? '—' : `${(kpis.fraudRate * 100).toFixed(1)}%`}
             </div>
             <p className="mt-1 text-xs text-slate-500">Flagged vs. total volume</p>
           </CardContent>
@@ -123,9 +126,9 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold text-slate-900">
-              {loading ? '—' : kpis.avgScore.toFixed(2)}
+              {loading || !metrics ? '—' : kpis.avgScore.toFixed(2)}
             </div>
-            <p className="mt-1 text-xs text-slate-500">Model confidence across alerts</p>
+            <p className="mt-1 text-xs text-slate-500">Uncalibrated model scores across alerts</p>
           </CardContent>
         </Card>
       </div>
@@ -133,7 +136,7 @@ export default function OverviewPage() {
       <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Fraud rate trend</CardTitle>
+            <CardTitle>Flag rate trend</CardTitle>
           </CardHeader>
           <CardContent className="h-[280px]">
             {metrics?.fraudRateSeries?.length ? (
@@ -165,7 +168,7 @@ export default function OverviewPage() {
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-slate-500">
-                {loading ? 'Loading chart…' : 'No fraud rate data yet'}
+                {loading ? 'Loading chart…' : 'No flag rate data yet'}
               </div>
             )}
           </CardContent>

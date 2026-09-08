@@ -25,3 +25,9 @@ services/ml/artifacts/metadata.json
 # IDE
 .vscode/
 .idea/
+
+# Build and browser verification output
+dist/
+*.tsbuildinfo
+playwright-report/
+test-results/

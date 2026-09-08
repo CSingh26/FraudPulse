@@ -6,8 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "echo \"shared: lint not configured\"",
-    "test": "echo \"shared: no tests\""
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "3.23.8"

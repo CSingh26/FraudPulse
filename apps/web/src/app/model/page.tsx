@@ -57,7 +57,7 @@ export default function ModelPage() {
       <div>
         <h3 className="text-2xl font-semibold text-slate-900">Model</h3>
         <p className="mt-1 text-sm text-slate-500">
-          Current scoring model metadata and validation performance.
+          Legacy operational scorer. Auto-trained demo artifacts are synthetic; behavioral research is evaluated separately.
         </p>
       </div>
 
@@ -83,7 +83,7 @@ export default function ModelPage() {
             <div className="flex items-center justify-between">
               <span>Threshold</span>
               <span className="font-medium text-slate-900">
-                {loading ? '—' : (modelInfo?.threshold?.toFixed(2) ?? '0.70')}
+                {loading ? '—' : (modelInfo?.threshold?.toFixed(2) ?? 'Unavailable')}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function ModelPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Validation metrics</CardTitle>
+            <CardTitle>Chronological holdout metrics</CardTitle>
             <CardDescription>Precision, recall, and ROC-AUC.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-600">
@@ -150,7 +150,7 @@ export default function ModelPage() {
       <Card>
         <CardHeader>
           <CardTitle>Confusion matrix</CardTitle>
-          <CardDescription>Validation set outcomes for fraud detection.</CardDescription>
+          <CardDescription>Holdout outcomes for fraud detection.</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 
@@ -90,7 +91,7 @@ router.get('/', async (req, res, next) => {
     const query = listQuerySchema.parse(req.query);
     const skip = (query.page - 1) * query.pageSize;
 
-    const where = query.q
+    const where: Prisma.TransactionWhereInput = query.q
       ? {
           OR: [
             {

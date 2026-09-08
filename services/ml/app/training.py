@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
 import pandas as pd
+import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, roc_auc_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, average_precision_score, confusion_matrix, precision_score, recall_score, roc_auc_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -64,16 +64,22 @@ def train_model(
   if LABEL_COLUMN not in dataset.columns:
     raise ValueError('Dataset must include a label column')
 
+  if 'timestamp' not in dataset:
+    raise ValueError('Training CSV requires timestamp for chronological holdout')
+  dataset['timestamp'] = pd.to_datetime(dataset.timestamp, utc=True, errors='raise')
+  dataset = dataset.sort_values('timestamp').reset_index(drop=True)
+  if not dataset.label.isin([0, 1]).all() or not np.isfinite(dataset.amount).all() or (dataset.amount <= 0).any():
+    raise ValueError('Invalid labels or amounts')
+  times = dataset.timestamp.drop_duplicates().tolist()
+  if len(times) < 10:
+    raise ValueError('Training needs at least 10 distinct timestamps')
+  cutoff = times[int(len(times) * .8)]
+  train_mask = dataset.timestamp < cutoff
   X = dataset[CATEGORICAL_FEATURES + NUMERIC_FEATURES]
   y = dataset[LABEL_COLUMN].astype(int)
-
-  X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42,
-    stratify=y,
-  )
+  X_train, X_test, y_train, y_test = X[train_mask], X[~train_mask], y[train_mask], y[~train_mask]
+  if y_train.nunique() < 2 or y_test.nunique() < 2:
+    raise ValueError('Training and test periods must contain both classes')
 
   preprocessor = ColumnTransformer(
     transformers=[
@@ -101,6 +107,7 @@ def train_model(
     'precision': float(precision_score(y_test, predictions, zero_division=0)),
     'recall': float(recall_score(y_test, predictions, zero_division=0)),
     'roc_auc': float(roc_auc_score(y_test, probabilities)),
+    'average_precision': float(average_precision_score(y_test, probabilities)),
   }
 
   tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
@@ -109,12 +116,14 @@ def train_model(
   model_path = output_dir / 'model.joblib'
   metadata_path = output_dir / 'metadata.json'
 
-  model_version = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+  model_version = ('csv-' if dataset_path else 'demo-') + datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')
   feature_names = pipeline.named_steps['preprocessor'].get_feature_names_out().tolist()
 
   metadata = {
     'model_version': model_version,
-    'trained_at': datetime.utcnow().isoformat() + 'Z',
+    'trained_at': datetime.now(timezone.utc).isoformat(),
+    'source': 'USER CSV' if dataset_path else 'DEMO DATA',
+    'split_method': 'chronological 80/20',
     'threshold': threshold,
     'metrics': metrics,
     'confusion_matrix': {

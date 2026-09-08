@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 
 from .config import settings
 from .training import build_feature_frame

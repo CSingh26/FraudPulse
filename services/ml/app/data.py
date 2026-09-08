@@ -75,6 +75,7 @@ def generate_synthetic_dataset(sample_size: int = 5000, seed: int = 42) -> pd.Da
 
   return pd.DataFrame(
     {
+      'timestamp': pd.date_range('2025-01-01', periods=sample_size, freq='min', tz='UTC').astype(str),
       'amount': amount,
       'currency': currency,
       'card_country': card_country,
