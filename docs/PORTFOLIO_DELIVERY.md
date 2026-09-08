@@ -53,3 +53,9 @@ A later LedgerLens review exposed FastAPI's default nonfinite-error serializatio
 Nonfinite request validation follow-up `230de0dd5783801c1aeec4d0ef7c41213de5d3e1` passed full default-branch CI: https://github.com/CSingh26/FraudPulse/actions/runs/34281570720. The ML suite now has 16 passing tests (21 total across ML/API/browser checks).
 
 A newly available Next.js advisory GHSA-p293-qw3h-jr36 affected the earlier tested 15.5.21 pin. Next and eslint-config-next were updated together to 15.5.25 with the pnpm lock regenerated. Web lint, production build and type checks passed; the production dependency audit again returned zero known advisories. Earlier zero-advisory reports reflect their original check times, not a guarantee against future disclosures.
+
+## Full dependency coverage follow-up
+
+The later full dependency audit included development tooling and found advisories excluded by the earlier production-only checks. Updated Vitest to 4.1.11, tsx to 4.23.13 and sharp to 0.35.4; pinned the compatible Vite 6.4.3 line and patched transitive dependencies with major-scoped overrides (including Ajv 6.15.0, brace-expansion 1.1.18/2.1.4 and js-yaml 4.3.2). Vitest now explicitly discovers the two original source test files, avoiding duplicate compiled CommonJS copies in build output. No source tests were removed or weakened.
+
+The complete audit now reports **zero advisories across all severities**; CI runs `pnpm audit` without a production-only filter or severity suppression. Local verification passed all 16 ML tests, 3 PostgreSQL API tests and 2 real browser journeys, web/Python lint, all workspace type checks and production builds. The implementation commit contains this evidence and the regenerated pnpm 9 lock; its immutable SHA and latest full-audit CI result are reported by the portfolio delivery task.

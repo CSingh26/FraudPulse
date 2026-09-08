@@ -41,6 +41,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit
       - run: pip install -r services/ml/requirements.txt
       - run: pnpm --filter @fraudpulse/api exec prisma migrate deploy
       - run: pnpm test:api
