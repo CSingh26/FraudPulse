@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, Header, HTTPException
 
 from .config import settings
+from .research_routes import router as research_router
 from .model import get_model_metadata, score_with_model
 from .scoring import score_transaction
 from .schemas import (
@@ -18,6 +19,7 @@ from .training import train_model
 
 app = FastAPI(title='FraudPulse ML Service', version=settings.model_version)
 logger = logging.getLogger(__name__)
+app.include_router(research_router)
 
 
 def _artifacts_exist() -> bool:

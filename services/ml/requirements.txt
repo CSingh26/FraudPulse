@@ -4,3 +4,6 @@ numpy==2.0.2
 pandas==2.2.2
 scikit-learn==1.5.1
 uvicorn[standard]==0.30.6
+scipy==1.14.1
+httpx==0.28.1
+ruff==0.12.12

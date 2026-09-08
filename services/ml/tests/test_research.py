@@ -50,7 +50,7 @@ class BehaviorTests(unittest.TestCase):
                              ('timestamp', '2026-01-01'), ('timestamp', 'not a date'),
                              ('label', 0.5), ('account_id', ''), ('country', None)]:
             with self.subTest(field=field, value=value):
-                data = rows()
+                data = rows().astype(object)
                 data.loc[0, field] = value
                 with self.assertRaises(ValueError):
                     validate_transactions(data)
